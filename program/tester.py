@@ -286,44 +286,45 @@ class tester():
             displayOutputPlace.append("checking ports")
             for i in range(6):
                 maybePort = "/dev/ttyACM"+str(i)
-                commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m2560 -P " + maybePort + " -c stk500v2 -B5 -F"
+                commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m2560 -P " + maybePort + " -c stk500v2 -F -D"
                 QApplication.processEvents()#this makes the UI update before going on.
                 start = datetime.datetime.now()
-            process = subprocess.Popen(commandAvrDude,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True)
-            working = False
-            while process.poll() is None:
-                time.sleep(0.1)
-                now = datetime.datetime.now()
-                if (now - start).seconds > 2 and working == False:
-                    displayOutputPlace.append("Working...")
-                    working = True
-                    QApplication.processEvents()#this makes the UI update before going on.
-                if (now - start).seconds > 10:
-                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
-                    os.kill(process.pid, signal.SIGKILL)
-                    os.waitpid(-1, os.WNOHANG)
-                    print "timed out"
-                    output = process.stdout.read()
-                    error = process.stderr.read()
-                    print "error:", error
-                    print "output", output
-                    if "timeout" in error:
-                        self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
-                        USBserialPort = "timeout"
-            output = process.stdout.read()
-            error = process.stderr.read()
-            print error
-            print maybePort
-            if "avrdude: AVR device initialized and ready to accept instructions" in error:
+                process = subprocess.Popen(commandAvrDude,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True)
+                working = False
+                while process.poll() is None:
+                    time.sleep(0.1)
+                    now = datetime.datetime.now()
+                    if (now - start).seconds > 2 and working == False:
+                        displayOutputPlace.append("Working...")
+                        working = True
+                        QApplication.processEvents()#this makes the UI update before going on.
+                    if (now - start).seconds > 10:
+                        subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
+                        os.kill(process.pid, signal.SIGKILL)
+                        os.waitpid(-1, os.WNOHANG)
+                        print "timed out"
+                        output = process.stdout.read()
+                        error = process.stderr.read()
+                        print "error:", error
+                        print "output", output
+                        if "timeout" in error:
+                            self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
+                            USBserialPort = "timeout"
+                output = process.stdout.read()
+                error = process.stderr.read()
+                print error
+                print maybePort
+                if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
                     self.boldLine(displayOutputPlace,"this is the port:"+str(USBserialPort))
                     print"This is the port: ", USBserialPort
                     portFound = True
+                    break
         if portFound == False:
             self.boldLine(displayOutputPlace,"Arduino port not found in scan")
             return None
         else:
-            commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m2560 -P " + USBserialPort  + " -c stk500v2 -B5 -F"
+            commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m2560 -P " + USBserialPort  + " -c stk500v2 -F -D"
             return commandAvrDude 
                 
     def testArduinoMegaMAC(self,displayOutputPlace):
@@ -575,7 +576,9 @@ class tester():
             
     def testArduinoNanoNIX(self,displayOutputPlace): 
         USBserialPort = None
-        ardOnUsb = False
+        #ardOnUsb = False
+        ardOnUsb = True
+        """
         output,error = subprocess.Popen(r"lsusb",stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
         if "FT232" in output:
             self.boldLine(displayOutputPlace,"Arduino Nano maybe in USB list")
@@ -619,7 +622,7 @@ class tester():
                 else: displayOutputPlace.append("Arduino has been on\n port: "+str(port))
                 
         if port == None: displayOutputPlace.append("Arduino not listed in dmesg")
-        
+        """
         #try avrdude on all ttyACM's:
         portFound = False
         if ardOnUsb == True:

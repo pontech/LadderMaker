@@ -294,7 +294,17 @@ class AboutHelpDialog(QtGui.QDialog):
             helpHtml=myfile.read()
         self.ui.textBrowser.setHtml(helpHtml)
         
-        
+
+class ThreeParallelsDialog(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        # Set up the UI from Designer:
+        self.ui = Ui_IODialog()
+        self.ui.setupUi(self)
+        with open ("parallels.html", 'r') as myfile:
+            helpHtml=myfile.read()
+        self.ui.textBrowser.setHtml(helpHtml)
+
         
 class USBHelpDialog(QtGui.QDialog):
     def __init__(self, parent=None):

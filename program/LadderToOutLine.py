@@ -17,7 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #this wil be the ladder grid to C functions
 # cell structure:
 #(self, midPointX, midPointY, MTorElement, rungOrOR, variableName, ioAssign, comment, setPoint):
-
+import popupDialogs
 from managegrid import ManageGrid       
 
 class ladderToOutLine():
@@ -558,7 +558,12 @@ class ladderToOutLine():
                 break
             #if self.grid[p][q].brchE = True:
             #    break
-
+        if parallels>1:
+            print"MORE THAN TWO PARALLELS"
+            self.dialog = popupDialogs.ThreeParallelsDialog()
+            self.dialog.setWindowTitle('parallelOR')
+            self.dialog.setGeometry(100, 100, 290, 120)
+            self.dialog.exec_()# For Modal dialogs
         return parallels+blanks
     
     #>>>PROCESS NODE:

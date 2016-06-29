@@ -10,10 +10,10 @@ When the device is plugged in, it will show in the lsusb list as "USBtiny."<br><
 Permissions: (If running as a user other than root) 
 <br>
 
-Use sudo <i>a_text_editor</i>, and create a new file: usbtiny.rules in /etc/udev/rules.d/  
+Use sudo <i>a_text_editor</i>, and create a new file: usbbtiny.rules in /etc/udev/rules.d/  
 <br>
 Put one line in it:  
-SUBSYSTEM== "usb", ATTR{product}=="USBtiny", ATTR{idProduct}=="0c9f", ATTRS{idVendor}=="1781", MODE="666", GROUP="dialout" 
+SUBSYSTEM== "usb", ATTR{product}=="USBtiny", ATTR{idProduct}=="0c9f", ATTRS{idVendor}=="1781", MODE="0660", GROUP="dialout" 
 <br>
 Disconnect and reconnect USB. Or, (in a terminal) $ sudo udevadm control --reload-rules 
 <br>

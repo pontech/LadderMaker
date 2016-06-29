@@ -150,7 +150,8 @@ class OutLineToC():
         if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
             C_txt = C_txt +"uint16_t read_adc(uint8_t channel)\n{\n"
             #C_txt = C_txt +"    sei();//set enable interrupts\n"    
-            C_txt = C_txt +"    ADMUX = ADMUX | channel;// set channel , by masking channel number to ADMUX\n"
+            C_txt = C_txt +"    ADMUX = channel;// set channel\n"
+            C_txt = C_txt +"    ADMUX |=  (1<<REFS0);// sets ref volts to Vcc\n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADEN); // enable the ADC\n"
             C_txt = C_txt +"    sample_count = 0; ADCtotal = 0;//clear sample count\n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADSC);//start conversion\n"     
@@ -164,7 +165,6 @@ class OutLineToC():
         if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
             C_txt = C_txt +"//set up ADC\n"    
             C_txt = C_txt +"    ADCSRA |= ( (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) );//  sets adc clock prescaler to 128 //checked\n"
-            C_txt = C_txt +"    ADMUX |=  (1<<REFS0); // sets ref volts to Vcc \n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADIE); // enable ADC conversion complete interrupt\n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADATE);// set to auto trigger (free running by default)\n"	
         C_txt = self.DDROutPuts(C_txt)#//do DDR's#//use outputlist to generate
@@ -208,6 +208,7 @@ class OutLineToC():
                     pwmList.append(outLine[i][1])
 
         #go through the outLine and create  if-then and or statements from elements
+
         currentBranchList=[None]
         for i in range (len(outLine)):
             if "//" in outLine[i]:
@@ -223,6 +224,7 @@ class OutLineToC():
                 C_txt = C_txt + "             branch_"+\
                         str(outLine[i][1][0])+"_"+str(outLine[i][1][1])+ " = 1;\n"
                 currentBranchList.append(outLine[i][1])#this keeps track of the nested branches
+            #print "current branch", currentBranchList
             #COMPARISONS:
             ##027##
             #"Equals" "Greater""Lessthan""GreaterOrEq""LessOrEq"
@@ -299,7 +301,7 @@ class OutLineToC():
                     tempText2 = tempText2 +" )) {branch_"+str(currentBranchList[-1][0])+"_"+str(currentBranchList[-1][1])+" = 1;} \n" 
                 else:
                     tempText1 = tempText1 +" )) {W = 0;} //"+ str(outLine[i][0])+ str(outLine[i][1])+"\n"
-                    tempText2 = tempText2 +" )) {W = 1;} //"+ str(outLine[i][0])+ str(outLine[i][1])+" /w latching element\n"
+                    tempText2 = tempText2 +" )) {W = 1;} //"+ str(outLine[i][0])+ str(outLine[i][1])+" if is latching element\n"
                 C_txt = C_txt + tempText1+ tempText2
                     
             #State Users: (need to know the last state of the rung and the current state
